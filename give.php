@@ -4,99 +4,138 @@ require_once './txt2img.php';
 require_once './imageMerge.php';
 use Grafika\Grafika; // Import package
 use Grafika\Color;
+Date_default_timezone_set("PRC");
 
 $error='';
 $words=getWords();
 $url=getImageUrl();
+
+
 // $url='https://unsplash.it/750/1000/?random';
 // echo $url;
 $dataArr=array(
   'images' =>   array(
-    // array(
-    //   'x' => 0, 
-    //   'y' => 0, 
-    //   'w' => 600, 
-    //   'h' => 300, 
-    //   'stretch' => true, 
-    //   'path' => './image/src/4.jpg', 
-    //   ),
     array(
-      'x' => -80, 
-      'y' => -350, 
-      'w' => 90, 
+      'x' => -50, 
+      'y' => -220, 
+      'w' => 50, 
       // 'h' => 300, 
       'stretch' => false, 
       // 'path' => getSealUrl(),  
       'path' => './image/src/11.jpg',  
       // 'path' => "http://yinzhang.388g.com/maker/tmp/C_21.png",  
       ),
-    
     array(
       'x' => 0, 
       'y' => 0, 
-      'w' => 750, 
+      'w' => 562, 
       // 'h' => 1100, 
       'stretch' => false, 
       // 'path' => './image/src/10.jpg',  
       'path' => $url,  
       ),
     array(
-      'x' => -50, 
-      'y' => -50, 
-      'w' => 100, 
+      'x' => -40, 
+      'y' => -40, 
+      'w' => 80, 
       'stretch' => false, 
-      'path' => './image/src/9.jpg',  
+      'path' => './image/src/9.png',  
       ),
     ), 
   'texts' =>   array(
     array(
-      'x' => 50, 
-      'y' => -60, 
-      'w' => 520, 
+      'x' => 30, 
+      'y' => -30, 
+      'w' => 400, 
       'color' => '#000000', 
-      'fontsize' =>22,
+      'fontsize' =>18,
       'stretch' => flase, 
       'lineheightRate' =>1.6,
       'wordWidthRate' =>1.32,
       'font' => './grafika/fonts/chengjishi.ttf', 
       'text' => $words
       ),
-//     array(
-//       'x' => 60, 
-//       'y' => 630, 
-//       'w' => 610, 
-//       'fontsize' => 28, 
-//       'lineheightRate' =>1.6,
-//       'color' => '#000000',
-//       'stretch' => false, 
-//       'font' => './grafika/fonts/chengjishi.ttf',
-//       'text' => '
-// 其实，我觉得南开的妹子都好不容易，长得那么好看，还要努力学习。
-// 不然就会被别的大学学生说：“看，南开的女生，除了长得漂亮，还是长得漂亮，要不我们转学吧！”
 
-// 2017-3-7
-// 南开妹纸女生节快乐'
-//       ), 
-    // array(
-    //   'x' => -50, 
-    //   'y' => -0.1, 
-    //   'w' => 200, 
-    //   'fontsize' => 14, 
-    //   'font' => './grafika/fonts/chengjishi.ttf', 
-    //   'color' => '#ffffff',
-    //   'stretch' => false, 
-    //   'text' => 'by 南开科技'
-    //   ), 
+    
     ),
   'canvas' =>   array(
-    'w' => 750, 
-    'h' => 1334, 
+    'w' => 562, 
+    'h' => 1000, 
     'stretch' => false, 
     ),
   );
+  // $_POST['userword']="清新小文艺，出门老黄历。\nRedream上线新功能——朋友圈配图生成，可自定义文字生成文艺图片，若无文字，默认生成当天老黄历。\n回复“图片”或识别二维码体验立即体验哦";
+  if($_POST['userword']){
+    $customArr=array(
+        array(
+        'x' => 30, 
+        'y' => 500, 
+        'w' => 480, 
+        'fontsize' => 22, 
+        'lineheightRate' =>1.6,
+        'color' => '#000000',
+        'stretch' => false, 
+        'font' => './grafika/fonts/chengjishi.ttf',
+        'text' => $_POST['userword']
+          ), 
+      );
+  }else{
+    //日历
+    $customArr=array(
+    array(
+      'x' => 30, 
+      'y' => 450, 
+      'w' => 480, 
+      'fontsize' => 16, 
+      'lineheightRate' =>1.6,
+      'color' => '#000000',
+      'stretch' => false, 
+      'font' => './grafika/fonts/song.ttf',
+      'text' => getLunarCalendar()
+      ), 
+    array(
+      'x' => 30, 
+      'y' => 500, 
+      'w' => 480, 
+      'fontsize' => 120, 
+      'lineheightRate' =>1.6,
+      'color' => '#000000',
+      'stretch' => false, 
+      'font' => './grafika/fonts/song.ttf',
+      'text' => date('d')
+      ), 
+    array(
+      'x' => 240, 
+      'y' => 600, 
+      'w' => 300, 
+      'fontsize' => 20, 
+      'lineheightRate' =>1.6,
+      'color' => '#000000',
+      'stretch' => false, 
+      'font' => './grafika/fonts/song.ttf',
+      'text' => date('Y/m')
+      ), 
+    array(
+      'x' => 30, 
+      'y' => 720, 
+      'w' => 400, 
+      'fontsize' => 18, 
+      'lineheightRate' =>1.6,
+      'color' => '#000000',
+      'stretch' => false, 
+      'font' => './grafika/fonts/song.ttf',
+      'text' => getYiJI()
+      ), 
+    );
+  }
+  
+
+  $dataArr['texts']=array_merge($dataArr['texts'],$customArr);
   $res=new ImageMerge($dataArr);
   // $res->saveImage('./image/dist');
   $res->showImage();
+  // echo getYiJI();
+
 
 
 
@@ -113,13 +152,16 @@ function getWords(){
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);  //不输出结果
   $result=curl_exec($ch);
   $info = curl_getinfo($ch);
-  // print_r($info);
   if (!preg_match('/<div class=\"one-cita\">([\s\S]*?)<\/div>/i',$result,$match)) {
-    $error='正则匹配失败';
+    $error='正则匹配失败,请重试';
+    // print_r($result);
     die($error);
   }
-  // print_r($match);
   curl_close($ch);
+  //超过40个汉字就重新换
+  if(mb_strlen($match[1])>80){
+    $match[1]=getWords();
+  }
   return $match[1];
 }
 
@@ -138,14 +180,11 @@ function getImageUrl(){
   curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);  //不输出结果
   $result=curl_exec($ch);
   $info = curl_getinfo($ch);
-  // print_r($info);
-  // 
   if (!preg_match('/<div class=\"one-imagen\">([\s\S]*?)<img src=\"([\s\S]*?)\"/i',$result,$match)) {
     $error='正则匹配失败';
     echo $url;
     die($error);
   }
-  // print_r($match);
   curl_close($ch);
   return $match[2];
 }
@@ -190,40 +229,134 @@ function getSealUrl($text='重拾旧梦',$id=351,$signsize=90){
 }
 
 
-// function getSealUrl($text='重拾旧梦',$id=351,$signsize=90){
-//   $url="http://www.redream.cn/getseal.php";
-//   $ch = curl_init($url);
-//   curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10); 
-//   curl_setopt($ch, CURLOPT_TIMEOUT, 120);
-//   curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);  //不输出结果
-//   $result=curl_exec($ch);
-//   $info = curl_getinfo($ch);
-//   curl_close($ch);
-//   print_r($result);
-
-//   // $url=$result;
-//   // $ch = curl_init($url);
-//   // curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10); 
-//   // curl_setopt($ch, CURLOPT_TIMEOUT, 120);
-//   // curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);  //不输出结果
-//   // $result=curl_exec($ch);
-//   // $info = curl_getinfo($ch);
-//   // curl_close($ch);
-//   // print_r($result);
-//   // sleep(23);
-//   return $result;
+//公历转农历api
+//http://www.wnfangsong.com/api/date/api.php?d=20170313
+//{
+// status: 1,
+// data: {
+// year: "二零一七",
+// month: "二月",
+// day: "十六",
+// era: "丁酉",
+// week: "一",
+// zodiac: "鸡",
+// constellation: "双鱼座",
+// note: ""
+// },
+// log: "公历转农历完毕。"
 // }
+// 随机生成今日谊、忌
+function getLunarCalendar(){
+  $url="http://www.wnfangsong.com/api/date/api.php?d=".date('Ymd');
+  $ch = curl_init($url);
+  curl_setopt($ch, CURLOPT_FILE, $tempImage);
+  curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10); 
+  curl_setopt($ch, CURLOPT_TIMEOUT, 120);
+  curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);  //不输出结果
+  $result=curl_exec($ch);
+  $info = curl_getinfo($ch);
+  curl_close($ch);
+  $dataArr=json_decode($result,true);
+  $dataArr=$dataArr['data'];
+  // print_r($dataArr);
+  return '农历  '.$dataArr['year'].'  '.$dataArr['month'].$dataArr['day'].'  '.$dataArr['era'].'  '.$dataArr['zodiac'].'  '.'双鱼座';
+}
 
 
-// //随机IP
-// function Rand_IP(){
+//获取谊忌
+function getYiJI(){
+  $data = array(
+    '交朋友',
+    '表白',
+    '喝酒',
+    '逛街',
+    '购物',
+    '做作业',
+    '泡吧',
+    '撩妹子',
+    '大醉一场',
+    '旅行',
+    '出门',
+    '宅',
+    '看电影',
+    '撸妆',
+    '泡妞',
+    '睡男神',
+    '听歌',
+    '睡觉',
+    '吃大餐',
+    '看书',
+    '胡说八道',
+    '打架',
+    '看小黄书',
+    '牵手',
+    '洗澡',
+    '裸睡',
+    '打扫',
+    '翻旧账',
+    '花钱',
+    '熬夜',
+    '陪对象',
+    '考试',
+    '少女心',
+    '开脑洞',
+    '早睡觉',
+    '求职',
+    '求子',
+    '健身',
+    '相信第六感',
+    '吃肉',
+    '项目上线',
+    '表白',
+    '追女神',
+    '啪啪啪',
+    '剁手',
+    '起床',
+    '休假',
+    '学习',
+    '关爱单身狗',
+    '二人世界',
 
-//     $ip2id= round(rand(600000, 2550000) / 10000); //第一种方法，直接生成
-//     $ip3id= round(rand(600000, 2550000) / 10000);
-//     $ip4id= round(rand(600000, 2550000) / 10000);
-//     //下面是第二种方法，在以下数据中随机抽取
-//     $arr_1 = array("218","218","66","66","218","218","60","60","202","204","66","66","66","59","61","60","222","221","66","59","60","60","66","218","218","62","63","64","66","66","122","211");
-//     $randarr= mt_rand(0,count($arr_1)-1);
-//     $ip1id = $arr_1[$randarr];
-//     return $ip1id.".".$ip2id.".".$ip3id.".".$ip4id;
-// }
+    '少女心',
+    '开脑洞',
+    '早睡觉',
+    '求职',
+    '求子',
+    '健身',
+    '相信第六感',
+    '吃肉',
+    '项目上线',
+    '表白',
+    '追女神',
+    '啪啪啪',
+    '剁手',
+    '起床',
+    '休假',
+    '学习',
+    '关爱单身狗',
+    '二人世界',
+
+   );
+  $day=date('d');
+  $hour=date('G');
+  $minute=intval(date('i')); //有前导0
+  $weekday=date("w");
+  $str="宜：".$data[$day].'、';
+  array_splice($data,$day,1);
+  $str.=$data[$hour].'、';
+  array_splice($data,$hour,1);
+  $str.=$data[$weekday].'、';
+  array_splice($data,$weekday,1);
+  $str.=$data[$minute]."\n\n";
+  array_splice($data,$minute,1);
+
+  $str.="忌：".$data[$day].'、';
+  array_splice($data,$day,1);
+  $str.=$data[$hour].'、';
+  array_splice($data,$hour,1);
+  $str.=$data[$minute];
+  array_splice($data,$minute,1);
+
+  // print_r($data);
+  return $str;
+}

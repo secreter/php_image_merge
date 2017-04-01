@@ -101,13 +101,35 @@ class ImageMerge
   private $canvas;
   function __construct($dataArr)
   {
+    // print_r($dataArr);
+    // exit();
+    if (!$this->checkParams($dataArr)) {
+      exit();
+    }
     $this->dataArr=$dataArr;
     $this->canvasWidth=$dataArr['canvas']['w'];
     $this->init();
   }
+  /**
+   * 用来检查传入的参数是否合法
+   * @param  [type] $dataArr [description]
+   * @return [type]          [description]
+   */
+  private function checkParams($dataArr){
+    // 不能同时为空
+    if (!isset($dataArr['texts']) && !isset($dataArr['images'])) {
+      print($dataArr);
+      echo "images and texts can't be empty the same time!";
+      return false;
+    }
+
+    return true;
+  }
   private function init()
   {
-    $this->allTxt2img();    //文本转为透明图片，并追加结果到dataArr
+    if (isset($this->dataArr['texts'])){
+      $this->allTxt2img();    //文本转为透明图片，并追加结果到dataArr
+    }
     $this->imageResize();   //传入的图片全部调整大小，并追加结果到dataArr
     $this->getCanvasHeight(); //获取最终的canvas高度
     $this->mergeImage();    //所有图层合并
@@ -154,18 +176,25 @@ class ImageMerge
       return $this->canvasHeight;
     }
     $h=0;
-    foreach ($this->dataArr['texts'] as $textItem) {
-      //可延伸的文字图片才计算高度，层叠上去的不计算
-      if ($textItem['stretch']==true) {
-        $h+=$textItem['h'];
+    if (isset($this->dataArr['texts'])) {
+      foreach ($this->dataArr['texts'] as $textItem) {
+        //可延伸的文字图片才计算高度，层叠上去的不计算
+        if ($textItem['stretch']==true) {
+          $h+=$textItem['h'];
+        }
       }
     }
-    foreach ($this->dataArr['images'] as $imageItem) {
-      //可延伸的图片才计算高度，层叠上去的不计算
-      if ($imageItem['stretch']==true) {
-        $h+=$imageItem['h'];
+    
+    //可以为空
+    if (isset($this->dataArr['images'])) {
+      foreach ($this->dataArr['images'] as $imageItem) {
+        //可延伸的图片才计算高度，层叠上去的不计算
+        if ($imageItem['stretch']==true) {
+          $h+=$imageItem['h'];
+        }
       }
     }
+    
     $this->canvasHeight=$h;
     return $this->canvasHeight;
   }
@@ -193,15 +222,20 @@ class ImageMerge
     $editor = Grafika::createEditor();
     $canvas=$this->createCanvas();
     
-    foreach ($this->dataArr['images'] as $imageItem) {
-      $origin=$this->getOrigin($imageItem);
-      $editor->blend ( $canvas, $imageItem['image'] , 'normal', 1, $origin,$imageItem['x'],$imageItem['y']);
+    if (isset($this->dataArr['images'])) {
+      foreach ($this->dataArr['images'] as $imageItem) {
+        $origin=$this->getOrigin($imageItem);
+        $editor->blend ( $canvas, $imageItem['image'] , 'normal', 1, $origin,$imageItem['x'],$imageItem['y']);
+      }
     }
-    //文字放在较高的图层上
-    foreach ($this->dataArr['texts'] as $textItem) {
-      $origin=$this->getOrigin($textItem);
-      $editor->blend ( $canvas, $textItem['image'] , 'normal', 1, $origin,$textItem['x'],$textItem['y']);
+    if (isset($this->dataArr['texts'])) {
+      //文字放在较高的图层上
+      foreach ($this->dataArr['texts'] as $textItem) {
+        $origin=$this->getOrigin($textItem);
+        $editor->blend ( $canvas, $textItem['image'] , 'normal', 1, $origin,$textItem['x'],$textItem['y']);
+      }
     }
+    
     $this->canvas=$canvas;
     return $this->canvas;
   }
@@ -227,6 +261,9 @@ class ImageMerge
   private function imageResize()
   {
     $editor = Grafika::createEditor();
+    if (!isset($this->dataArr['images'])) {
+      return $this->dataArr;
+    }
     foreach ($this->dataArr['images'] as $index => $item) {
 
       // $editor->open($image, $item['path']);
@@ -294,7 +331,7 @@ class ImageMerge
       fclose($tempImage);
       // exit();
       $editor->open($image , $imageName);
-      // unlink($imageName);
+      unlink($imageName);
       return $image;
     }else{
       //直接打开
@@ -310,7 +347,9 @@ class ImageMerge
   public function showImage()
   {
     header('Content-type: image/png'); // Tell the browser we're sending a png image
-    $this->canvas->blob('PNG'); 
+    $this->canvas->blob('PNG');
+    // echo "<img src='".base64_encode($this->canvas->blob('PNG'))."'>" ;
+    base64_encode($this->canvas->blob('PNG'));
   }
   public function saveImage($path)
   {
