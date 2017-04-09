@@ -10,20 +10,20 @@ let imgData = {
       stretch: true
     }
   ],
-  // texts: [
-  //   {
-  //     x: 0,
-  //     y: 0,
-  //     w: 300,
-  //     color: '#999999',
-  //     // font:"",
-  //     // fontsize:"",
-  //     // alpha:0,
-  //     // enRate:"",
-  //     stretch: true,
-  //     text: '刘壮壮是煞笔'
-  //   }
-  // ],
+  texts: [
+    {
+      x: 0,
+      y: 0,
+      w: 300,
+      color: '#999999',
+      // font:"",
+      // fontsize:"",
+      // alpha:0,
+      // enRate:"",
+      stretch: true,
+      text: '彭朝阳好帅'
+    }
+  ],
   canvas: {
     w: 500,
     h: 1000,

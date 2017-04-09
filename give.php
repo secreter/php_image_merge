@@ -337,10 +337,11 @@ function getYiJI(){
     '二人世界',
 
    );
-  $day=date('d');
+  $day=intval(date('d'));  //去前导0
   $hour=date('G');
   $minute=intval(date('i')); //有前导0
   $weekday=date("w");
+
   $str="宜：".$data[$day].'、';
   array_splice($data,$day,1);
   $str.=$data[$hour].'、';
